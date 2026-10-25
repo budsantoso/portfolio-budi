@@ -2,33 +2,41 @@
 
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const subscribe = () => () => {};
-const getSnapshot = () => true;
-const getServerSnapshot = () => false;
-
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const { theme, resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" aria-label="Toggle theme">
-        <Sun className="size-4" />
+      <Button variant="ghost" size="icon" aria-label="Toggle theme" className="size-9">
+        <Sun className="size-4 text-muted-foreground" />
       </Button>
     );
   }
+
+  const currentTheme = resolvedTheme || theme;
+  const isDark = currentTheme === "dark";
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label="Toggle theme"
+      className="size-9 rounded-lg hover:bg-muted"
     >
-      {resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      {isDark ? (
+        <Sun className="size-4 text-amber-400 transition-all hover:rotate-45" />
+      ) : (
+        <Moon className="size-4 text-slate-700 transition-all hover:-rotate-12" />
+      )}
     </Button>
   );
 }
